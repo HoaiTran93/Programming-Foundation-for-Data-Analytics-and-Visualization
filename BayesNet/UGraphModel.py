@@ -77,34 +77,39 @@ class UGraphModelAlgorithm(UGraphModel):
         ##(2) Process each vertex in vertexList
         mst = UGraphModel()
         while vertexList:
-            print("hoai test")
             vertex = vertexList[0]
             vertexList.remove(vertex)
-            print("vertex:", vertex)
 
             mst.add(vertex)
             hasChildren = True
 
-            while hasChildren is True:
+            while hasChildren:
                 crossEdges = PriorityQueue()
                 mstIt = mst.iterator()
                 while mstIt.hasNext():
                     parent = mstIt.next()
+                   # print("parent:",parent)
                     children = self.graph.getOutwardEdges(parent)
 
                     childrenIt = iter(children)
-                    child = next(childrenIt, None)
+                    #print("child:", child)
                     while True:
+                        child = next(childrenIt, None)
                         if child is None:
                             break
-                        if mst.contains(child) is not None:
-                            weight = self.graph.weight(parent, child)
-                            edge = Edge(parent, child, weight)
+                        if not mst.contains(child):
+                            weight = self.graph.getWeight(parent, child)
+                            #print("weight:", weight)
+                            msg = "parent:{}, child:{}, weight:{}".format(parent, child, weight)
+                            print(msg)
+                            edge = UGraphModelAlgorithm.Edge(parent, child, weight) ##to use inner class: inner = outer.Inner() . refer https://www.datacamp.com/community/tutorials/inner-classes-python
                             crossEdges.put(edge)
 
-                hasChildren = crossEdges.size() > 0
+                hasChildren = crossEdges.qsize() > 0
                 if hasChildren:
                     smallest = crossEdges.get()
+                    msg = "smallest vFrom:{}, vTo:{}, weight:{}".format(smallest.vFrom, smallest.vTo, smallest.weight)
+                    print(msg)
                     mst.add(smallest.vTo)
                     mst.connect(smallest.vFrom, smallest.vTo, smallest.weight)
                     vertexList.remove(smallest.vTo)
@@ -117,6 +122,15 @@ class UGraphModelAlgorithm(UGraphModel):
             self.vFrom = vFrom
             self.vTo = vTo
             self.weight = weight
+
+        def __eq__(self, other):
+            return self.weight == other.weight
+
+        def __lt__(self, other):
+            return self.weight < other.weight
+
+        def __gt__(self, other):
+            return self.weight > other.weight
 
     ##inner class Edge comparator
     class EdgeComparator(Edge):
