@@ -9,17 +9,15 @@ class UGraphModel(AbstractGraph):
         AbstractGraph.__init__(self)
 
     def connect(self, vFrom, vTo, weight=0):
-        try:
-            nodeF = self.getVertexNode(vFrom)
-        except nodeF is None:
+        nodeF = self.getVertexNode(vFrom)
+        if nodeF is None:
             msg = "The following vertex is not found: {}".format(vFrom)
-            print(msg)
+            raise NameError(msg)
 
-        try:
-            nodeT = self.getVertexNode(vTo)
-        except nodeT is None:
+        nodeT = self.getVertexNode(vTo)
+        if nodeF is None:
             msg = "The following vertex is not found: {}".format(vTo)
-            print(msg)
+            raise NameError(msg)
 
         nodeF.connect(nodeT, weight)
         nodeT.connect(nodeF, weight)

@@ -1,0 +1,5 @@
+Intelligent,SAT,Probility
+low,low,0.95
+low,high,0.05
+high,low,0.2
+high,high,0.8

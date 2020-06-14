@@ -1,6 +1,24 @@
 import numpy as np
 import sys
 from IGraph import IGraph
+import pandas as pd
+##
+class Table():
+    def __init__(self):
+        self.tableProb = None
+        return None
+
+    def get(self):
+        return self.tableProb
+
+    def toString(self):
+        return self.tableProb.to_string()
+
+    def read_data(self, file_name):
+        path = "./Data/" + str(file_name)
+        data = pd.read_csv(path)
+        self.tableProb = pd.DataFrame(data)
+        return self.tableProb
 
 ##
 class Edge():
@@ -19,9 +37,10 @@ class Edge():
         return desc
 
 ##
-class VertexNode(Edge):
-    def __init__(self, data=None):
+class VertexNode(Edge, Table):
+    def __init__(self, data=None, tableProb = None):
         self.vertex = data
+        self.tableProb = tableProb
         self.inDegree = self.outDegree = 0
         self.adList = []     
         
@@ -55,7 +74,10 @@ class VertexNode(Edge):
             if edge.equals(Edge(self, vTo)):
                 return edge
         return None
-            
+
+    def getTableProb(self):
+        return self.tableProb
+
     def removeTo(self, vTo):
         edgeIt = iter(self.adList)
         while True:
@@ -78,6 +100,8 @@ class VertexNode(Edge):
 
     def toString(self):
         desc = "V({}, in:{}, out:{})".format(self.vertex, self.inDegree, self.outDegree)
+        desc += "\n"
+        desc += self.tableProb.toString()
         return desc
 
 ##
@@ -129,8 +153,8 @@ class AbstractGraph(IGraph, VertexNode, GraphIterator):
                 return node
         return None
     
-    def add(self, vertex):
-        self.nodeList.append(VertexNode(vertex))
+    def add(self, vertex, tableProb):
+        self.nodeList.append(VertexNode(vertex, tableProb))
 
     def connect(self, vFrom, vTo, weight):
         VertexNode.connect(vFrom, vTo, weight)
@@ -238,8 +262,3 @@ class AbstractGraph(IGraph, VertexNode, GraphIterator):
 
     def iterator(self):
         return GraphIterator(self, iter(self.nodeList))
-         
-
-
-
-
