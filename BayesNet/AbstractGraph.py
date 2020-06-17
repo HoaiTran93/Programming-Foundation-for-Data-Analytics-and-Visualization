@@ -1,24 +1,6 @@
 import numpy as np
 import sys
 from IGraph import IGraph
-import pandas as pd
-##
-class Table():
-    def __init__(self):
-        self.tableProb = None
-        return None
-
-    def get(self):
-        return self.tableProb
-
-    def toString(self):
-        return self.tableProb.to_string()
-
-    def read_data(self, file_name):
-        path = "./Data/" + str(file_name)
-        data = pd.read_csv(path)
-        self.tableProb = pd.DataFrame(data)
-        return self.tableProb
 
 ##
 class Edge():
@@ -37,8 +19,8 @@ class Edge():
         return desc
 
 ##
-class VertexNode(Edge, Table):
-    def __init__(self, data=None, tableProb = None):
+class VertexNode(Edge):
+    def __init__(self, data = None, tableProb = None):
         self.vertex = data
         self.tableProb = tableProb
         self.inDegree = self.outDegree = 0
@@ -74,10 +56,7 @@ class VertexNode(Edge, Table):
             if edge.equals(Edge(self, vTo)):
                 return edge
         return None
-
-    def getTableProb(self):
-        return self.tableProb
-
+            
     def removeTo(self, vTo):
         edgeIt = iter(self.adList)
         while True:
@@ -262,3 +241,8 @@ class AbstractGraph(IGraph, VertexNode, GraphIterator):
 
     def iterator(self):
         return GraphIterator(self, iter(self.nodeList))
+         
+
+
+
+
