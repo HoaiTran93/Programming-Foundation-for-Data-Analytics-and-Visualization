@@ -4,10 +4,11 @@ from UGraphModel import *
 from DGraphModel import *
 from TableProbility import *
 
-class ReadInput():
+class ReadModel():
     def __init__(self, inputName):
         self.file = open(inputName)
         self.model = DGraphModel()
+
     def generate(self):
         self.probMap = dict()
         #self.probValue = dict()
@@ -42,6 +43,7 @@ class ReadInput():
         return tableCombinationProb
 
     def parsing_combinationProb(self, listProb, tableValue):
+        #print("tableValue: ", tableValue)
         output = []
         n = len(listProb)
         total = 1
@@ -67,6 +69,7 @@ class ReadInput():
             aResult = []
             for i in range(n):
                 aResult.append(listProb[i][int(index[i])])
+            #print("count: ", count)
             aResult.append(float(tableValue[count]))
             output.append(aResult)
             count += 1
@@ -81,3 +84,46 @@ class ReadInput():
             #print("parent: ",parent)
             if parent != '':
                 self.model.connect(parent, self.vertexName)
+
+class ReadTestCase():
+    def __init__(self, inputName):
+        self.file = open(inputName)
+
+    def generate(self):
+        listProb = []
+        listObs = []
+        for line in self.file:
+            ObservationList = dict()
+            Probability = dict()
+            print("line: ",line)
+            if len(line) == 2:
+                numVertex = line.split('\n')[0]
+            else:
+                inputGraph = line.split('\n')[0]
+                input = inputGraph.split(';')
+                #print("input: ", input)
+                prob = str(input[0])
+                #print("prob: ", prob)
+                for subProb in prob.split(','):
+                    #print("subProb: ",subProb)
+                    subP = subProb.split('=')
+                    #print("subP: ", subP)
+                    Probability.update({subP[0]:subP[1]})
+                condition = input[1].split(',')
+                #print("condition: ", condition)
+                for subcondition in condition:
+                    if subcondition == ' ':
+                        ObservationList = []
+                        break
+                    sub = subcondition.split('=')
+                    #print("subcondition: ",sub)
+                    ObservationList.update({sub[0]:sub[1]})
+                #print("Probability: ",Probability)
+                #print("ObservationList: ",ObservationList)
+                #print("=======")
+                listProb.append(Probability)
+                listObs.append(ObservationList)
+        return listProb,listObs
+        
+
+    

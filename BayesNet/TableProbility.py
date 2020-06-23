@@ -16,7 +16,7 @@ class ConditionalProbabilityTable():
         return list(set(self.ProbabilityTable[-2]))
 
     def isDiscreteDistribution(self):
-        if self.ParentsList == None:
+        if self.ParentsList == ['']:
             return True
         else:
             False
@@ -35,15 +35,20 @@ class ConditionalProbabilityTable():
     def getOutput(self,ParentState):
         if self.isDiscreteDistribution():
             sortedProba = self.ProbabilityTable.T[self.ProbabilityTable[1].argsort()].T
+            #print("sortedProba1: ",sortedProba)
         else:
             NodeProba = self.getNodeProbability(ParentState)
+            #print("NodeProba: ",NodeProba)
             sortedProba = NodeProba.T[NodeProba[1].argsort()].T
-        RandomValue = random.random()
+            #print("sortedProba2: ",sortedProba) 
+        RandomValue = np.random.random()
         for index in range(len(sortedProba)):
             if RandomValue < sortedProba[1][:index+1].astype(np.float).sum():
                 ParentState[self.NodeName] = sortedProba[0,index]
+                #print("ParentState1: ", ParentState)
                 return ParentState
         ParentState[self.NodeName] = sortedProba[0,-1]
+        #print("ParentState2: ", ParentState)
         return ParentState
 
 
@@ -54,7 +59,7 @@ class ConditionalProbabilityTable():
             else:
                 NodeProba = self.getNodeProbability(ParentState)
                 sortedProba = NodeProba.T[NodeProba[1].argsort()].T
-            RandomValue = random.random()
+            RandomValue = np.random.random()
             for index in range(len(sortedProba)):
                 if RandomValue < sortedProba[1][:index+1].astype(np.float).sum():
                     ParentState[self.NodeName] = sortedProba[0,index]
@@ -78,4 +83,5 @@ class ConditionalProbabilityTable():
             for j in range(len(self.initTable[i])):
                 desc += str(self.initTable[i][j]) + " "
             desc += "\n"
+        desc += str(self.ParentsList) + " " + str(self.NodeName)
         return desc
