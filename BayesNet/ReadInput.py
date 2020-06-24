@@ -9,25 +9,44 @@ class ReadModel():
         self.file = open(inputName)
         self.model = DGraphModel()
 
+    def correctInput(self):
+        lines = self.file.readlines()
+
+        ##remove spaces##
+        for i in range(len(lines)):
+            lines[i] = lines[i].strip()
+
+        ##remove empty lines##
+        while lines.count('') > 0:
+            lines.remove('')
+        
+        self.lines = lines
+
     def generate(self):
+        self.correctInput()
         self.probMap = dict()
         #self.probValue = dict()
-        for line in self.file:
-            if len(line) == 2:
+        for line in self.lines:
+            if line.find(";") == -1: #check num vertex
                 self.numVertex = line.split('\n')[0]
+                #print("numVertex: ",self.numVertex)
+                if int(self.numVertex) != len(self.lines) - 1:
+                    raise Exception("Num vertex is not enough")
             else:
                 inputGraph = line.split('\n')[0]
+                #print("inputGraph: ",inputGraph)
                 input = inputGraph.split(';')
+                #print("input: ",input)
                 self.vertexName = input[0]
-                #print("vertexName: ",vertexName)
+                #print("vertexName: ",self.vertexName)
                 self.vertexParentName = input[1].split(',')
-                #print("vertexParentName: ",self.vertexParentName)
+                # print("vertexParentName: ",self.vertexParentName)
                 self.vertexes = input[2].split(',')
-                #print("vertexes: ",self.vertexes)
+                # print("vertexes: ",self.vertexes)
                 self.tableSize = input[3].split(',')
-                #print("tableSize: ",self.tableSize)
+                # print("tableSize: ",self.tableSize)
                 self.tableValue = input[4].split(',')
-                #print("tableValue: ",self.tableValue)
+                # print("tableValue: ",self.tableValue)
                 self.probMap.update({self.vertexName:self.vertexes})
                 #self.probValue.update({self.vertexName:self.tableValue})
                 self.init_graph()
@@ -89,15 +108,32 @@ class ReadTestCase():
     def __init__(self, inputName):
         self.file = open(inputName)
 
+    def correctInput(self):
+        lines = self.file.readlines()
+
+        ##remove spaces##
+        for i in range(len(lines)):
+            lines[i] = lines[i].strip()
+
+        ##remove empty lines##
+        while lines.count('') > 0:
+            lines.remove('')
+        
+        self.lines = lines
+        
     def generate(self):
+        self.correctInput()
         listProb = []
         listObs = []
-        for line in self.file:
+        for line in self.lines:
             ObservationList = dict()
             Probability = dict()
-            print("line: ",line)
-            if len(line) == 2:
-                numVertex = line.split('\n')[0]
+            #print("line: ",line)
+            if line.find(";") == -1: #check numtest case
+                self.numTestcase = line.split('\n')[0]
+                #print("numTestcase: ",self.numTestcase)
+                if int(self.numTestcase) != len(self.lines) - 1:
+                    raise Exception("Num testcase is not enough")
             else:
                 inputGraph = line.split('\n')[0]
                 input = inputGraph.split(';')
@@ -112,7 +148,7 @@ class ReadTestCase():
                 condition = input[1].split(',')
                 #print("condition: ", condition)
                 for subcondition in condition:
-                    if subcondition == ' ':
+                    if subcondition == '':
                         ObservationList = []
                         break
                     sub = subcondition.split('=')
@@ -123,7 +159,7 @@ class ReadTestCase():
                 #print("=======")
                 listProb.append(Probability)
                 listObs.append(ObservationList)
-        return listProb,listObs
+        return listProb, listObs
         
 
     
