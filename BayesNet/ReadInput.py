@@ -28,14 +28,12 @@ class ReadModel():
         #self.probValue = dict()
         for line in self.lines:
             if line.find(";") == -1: #check num vertex
-                self.numVertex = line.split('\n')[0]
+                self.numVertex = int(line)
                 #print("numVertex: ",self.numVertex)
-                if int(self.numVertex) != len(self.lines) - 1:
+                if self.numVertex != len(self.lines) - 1:
                     raise Exception("Num vertex is not enough")
             else:
-                inputGraph = line.split('\n')[0]
-                #print("inputGraph: ",inputGraph)
-                input = inputGraph.split(';')
+                input = line.split(';')
                 #print("input: ",input)
                 self.vertexName = input[0]
                 #print("vertexName: ",self.vertexName)
@@ -130,13 +128,12 @@ class ReadTestCase():
             Probability = dict()
             #print("line: ",line)
             if line.find(";") == -1: #check numtest case
-                self.numTestcase = line.split('\n')[0]
+                self.numTestcase = int(line)
                 #print("numTestcase: ",self.numTestcase)
-                if int(self.numTestcase) != len(self.lines) - 1:
+                if self.numTestcase != len(self.lines) - 1:
                     raise Exception("Num testcase is not enough")
             else:
-                inputGraph = line.split('\n')[0]
-                input = inputGraph.split(';')
+                input = line.split(';')
                 #print("input: ", input)
                 prob = str(input[0])
                 #print("prob: ", prob)
