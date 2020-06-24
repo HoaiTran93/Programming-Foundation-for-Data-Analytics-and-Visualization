@@ -1,6 +1,6 @@
 import sys, getopt
 from ReadInput import *
-
+import time
 '''run directly'''
 '''
 def main():
@@ -25,9 +25,9 @@ def main(argv):
     rp.generate()
     rp.model.println()
     tp = ReadTestCase(testfile)
-    a,b = tp.generate()
-    print("a: ",a)
-    print("b: ",b)
+    Ques,Obser = tp.generate()
+    print("a: ",Obser)
+    print("b: ",Ques)
 
     DFS = 0
     BFS = 1
@@ -35,47 +35,73 @@ def main(argv):
     topo = sorter.sort(BFS)
     print("topoBFS:", topo)
 
-    sample = 30
-    RunForwardList = []
-    NodeList = []
-    for sampleIndex in range(sample):
-        RunningVar = {}
-        for nodeName in topo:
-            node = rp.model.getVertexNode(nodeName)
-            #print("nodeName: ",node.vertex)
-            #print("tableProb: ",node.tableProb)
-            NodeList.append(node.tableProb)
-            node.tableProb.getOutput(RunningVar)
-        RunForwardList.append(RunningVar)
-        
-    Observations = { 'I' : 'Cao', 'D' : 'Kho' }
-    NodeNameList = topo
-
-    RunValueList = []
-    KeyList = RunForwardList[0].keys()
-    for RunForwardValue in RunForwardList:
-        OneRow = []
-        ObservationsCheck = True
-        for key in Observations:
-            if Observations[key] != RunForwardValue[key]:
-                ObservationsCheck = False
-        if ObservationsCheck == True:
-            for key in RunForwardValue: 
-                OneRow.append(RunForwardValue[key])
-            RunValueList.append(OneRow)
-    NumpyRunValue = np.array(RunValueList)
-    NumpyKey = np.array(list(KeyList))
-
-
-    for Node in NodeList:
-        if Node.NodeName in Observations.keys():
-            print(Node.NodeName, Observations[Node.NodeName])
+    print("TOPO", topo )
+    sample = 300000
+    NodeList = [ rp.model.getVertexNode(nodeName).tableProb for nodeName in topo ]
+    ListOutput = []
+    for ques_index in range(len(Obser)):
+        #Observations = { 'I' : 'Cao', 'D' : 'Kho' }
+        if len(Obser[ques_index]) == 0:
+            Observations = {}
         else:
-            print(Node.NodeName)
-            indexNumpyRunValue = np.where(NumpyKey==Node.NodeName)[0][0]
-            for Value in Node.getValueList():
-                print(Value,len(np.where(NumpyRunValue[:,indexNumpyRunValue] == Value)[0])/NumpyRunValue.shape[0])
-        print('============================')
+            Observations = Obser[ques_index]
+        print(Observations)
+        Question     = Ques[ques_index]
+        RunForwardList = []
+        RunForwardWeight = []
+        start_time = time.time()
+        for sampleIndex in range(sample):
+            RunningVar = {}
+            ParentLikelihoodWeight = {}
+            w = 1
+            for nodeName in topo:   
+                node = rp.model.getVertexNode(nodeName)
+                RunningVar,ParentLikelihoodWeight = node.tableProb.getOutputWithLikehood(RunningVar,ParentLikelihoodWeight,Observations)
+            for key in Observations:
+                w *= ParentLikelihoodWeight[key]
+            RunForwardWeight.append(w)
+            RunForwardList.append(RunningVar)
+        
+        NodeNameList = topo
+    
+        RunValueList = []
+        WeightList = []
+        KeyList = []
+        for index_,RunForwardValue in enumerate(RunForwardList):
+            OneRow = []
+            for key in RunForwardValue: 
+                if key not in Observations:
+                    if index_ == 0:
+                        KeyList.append(key)
+                    OneRow.append(RunForwardValue[key])
+            RunValueList.append(OneRow)
+            WeightList.append(RunForwardWeight[index_])
+        NumpyRunValue = np.array(RunValueList)
+        NumpyKey = np.array(list(KeyList))
+        NumpyWeight = np.array(WeightList)
 
+        TotalWeight = np.sum(NumpyWeight)
+        ListofIndexQues = []
+        for Node in Question:
+            print(NumpyKey)
+            
+            NodeName = Node
+            Value    = Question[NodeName]
+            print(NodeName)
+            indexNumpyRunValue = np.where(NumpyKey==NodeName)[0][0]
+            print(indexNumpyRunValue)
+            ListofIndexQues += list(np.where(NumpyRunValue[:,indexNumpyRunValue] == Value)[0])
+            print(len(list(np.where(NumpyRunValue[:,indexNumpyRunValue] == Value)[0])))
+
+        print(len(ListofIndexQues))
+        ListofIndexQues = list(set(ListofIndexQues))
+        Output = np.sum(NumpyWeight[ListofIndexQues]) /TotalWeight
+        ListOutput.append(Output)
+        print("Sampling Time: ", (time.time()-start_time))
+
+    OutputFile = open("output.txt","w") 
+    for Output in ListOutput:
+        OutputFile.writelines(str(round( Output, 2  ))+'\n')
+    OutputFile.close()
 if __name__ == "__main__":
     main(sys.argv[1:])    

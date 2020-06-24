@@ -4,7 +4,9 @@ import sys
 class ConditionalProbabilityTable():
     def __init__(self,initTable,initParents,initNodeName):
         self.initTable = initTable
-        self.ProbabilityTable = np.array(initTable).T.astype(dtype='<U21')
+        TableShape = np.array(initTable).T.shape
+        self.ProbabilityTable = np.array(initTable).T[:-1].reshape(TableShape[0]-1,TableShape[1])
+        self.ProbabilityTableValues = np.array(initTable).T[-1].astype(np.float)
         self.ParentsList = initParents
         self.NodeName = initNodeName
         if self.isDiscreteDistribution() == False:
@@ -13,7 +15,7 @@ class ConditionalProbabilityTable():
                 raise NameError("Init failed, number of parents is wrong!")
 
     def getValueList(self):
-        return list(set(self.ProbabilityTable[-2]))
+        return list(set(self.ProbabilityTable[-1]))
 
     def isDiscreteDistribution(self):
         if self.ParentsList == ['']:
@@ -23,58 +25,54 @@ class ConditionalProbabilityTable():
 
     def getNodeProbability(self,ParentState):
         RunTable = self.ProbabilityTable
+        ValueTable = self.ProbabilityTableValues
         for name in self.ParentsList:
             if name in ParentState:
-                State = np.array(ParentState[name]).astype(dtype='<U21')
+                State = np.array(ParentState[name])
                 index = np.where( RunTable[0] == State )[0]
-                RunTable = RunTable[1:,index]
+                RunTable = RunTable[1:,index] 
+                ValueTable = ValueTable[index]
             else:
                 raise NameError("Parents state is not enough")
-        return RunTable
+        return RunTable[0], ValueTable
 
     def getOutput(self,ParentState):
-        if self.isDiscreteDistribution():
-            sortedProba = self.ProbabilityTable.T[self.ProbabilityTable[1].argsort()].T
-            #print("sortedProba1: ",sortedProba)
+        if self.isDiscreteDistribution(): 
+            NodeProba = self.ProbabilityTable[0]
+            ValueTable = self.ProbabilityTableValues
         else:
-            NodeProba = self.getNodeProbability(ParentState)
-            #print("NodeProba: ",NodeProba)
-            sortedProba = NodeProba.T[NodeProba[1].argsort()].T
-            #print("sortedProba2: ",sortedProba) 
+            NodeProba,ValueTable = self.getNodeProbability(ParentState)     
         RandomValue = np.random.random()
-        for index in range(len(sortedProba)):
-            if RandomValue < sortedProba[1][:index+1].astype(np.float).sum():
-                ParentState[self.NodeName] = sortedProba[0,index]
-                #print("ParentState1: ", ParentState)
+        for index in range(len(NodeProba)):
+            if RandomValue < ValueTable[:index+1].sum():
+                ParentState[self.NodeName] = NodeProba[index]
                 return ParentState
-        ParentState[self.NodeName] = sortedProba[0,-1]
-        #print("ParentState2: ", ParentState)
+        ParentState[self.NodeName] = NodeProba[-1]
         return ParentState
-
 
     def getOutputWithLikehood(self, ParentState, ParentLikelihoodWeight, Observations):
         if self.NodeName not in Observations.keys():
-            if self.isDiscreteDistribution():
-                sortedProba = self.ProbabilityTable.T[self.ProbabilityTable[1].argsort()].T
+            if self.isDiscreteDistribution():   
+                NodeProba = self.ProbabilityTable[0]
+                ValueTable = self.ProbabilityTableValues
             else:
-                NodeProba = self.getNodeProbability(ParentState)
-                sortedProba = NodeProba.T[NodeProba[1].argsort()].T
+                NodeProba,ValueTable = self.getNodeProbability(ParentState)
             RandomValue = np.random.random()
-            for index in range(len(sortedProba)):
-                if RandomValue < sortedProba[1][:index+1].astype(np.float).sum():
-                    ParentState[self.NodeName] = sortedProba[0,index]
+            for index in range(len(NodeProba)):
+                if RandomValue < ValueTable[:index+1].sum():
+                    ParentState[self.NodeName] = NodeProba[index]    
                     return ParentState, ParentLikelihoodWeight
-            ParentState[self.NodeName] = sortedProba[0,-1]
+            ParentState[self.NodeName] = NodeProba[-1]
             return ParentState, ParentLikelihoodWeight
         else:
-            if self.isDiscreteDistribution():
-                sortedProba = self.ProbabilityTable.T[self.ProbabilityTable[1].argsort()].T
+            if self.isDiscreteDistribution():   
+                NodeProba = self.ProbabilityTable[0]
+                ValueTable = self.ProbabilityTableValues
             else:
-                NodeProba = self.getNodeProbability(ParentState)
-                sortedProba = NodeProba.T[NodeProba[1].argsort()].T
-            index = np.where(sortedProba[0]==np.array(Observations[self.NodeName]).astype(dtype='<U21'))[0][0]
-            ParentState[self.NodeName] = sortedProba[0,index]
-            ParentLikelihoodWeight[self.NodeName] = float(sortedProba[1,index])
+                NodeProba,ValueTable = self.getNodeProbability(ParentState)
+            index = np.where(NodeProba==np.array(Observations[self.NodeName]))[0]
+            ParentState[self.NodeName] = NodeProba[index]
+            ParentLikelihoodWeight[self.NodeName] = float(ValueTable[index])
             return ParentState, ParentLikelihoodWeight
 
     def toString(self):
