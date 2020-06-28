@@ -1,4 +1,7 @@
-3
-G=A;I=Cao,D=Kho
-G=A,L=Manh;I=Cao,D=Kho
-G=B,S=Cao;
+6
+Alarm=False,Burglary=False;
+MaryCalls=True;Alarm=False
+Alarm=False;Burglary=False,Earthquake=True
+Alarm=True;Burglary=False,Earthquake=True
+MaryCalls=False;Alarm=False
+Alarm=True,Burglary=False;

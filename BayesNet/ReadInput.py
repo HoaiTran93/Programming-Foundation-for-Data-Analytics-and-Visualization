@@ -4,6 +4,7 @@ from UGraphModel import *
 from DGraphModel import *
 from TableProbility import *
 
+random.seed(0)
 class ReadModel():
     def __init__(self, inputName):
         self.file = open(inputName)

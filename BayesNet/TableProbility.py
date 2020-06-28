@@ -1,5 +1,6 @@
 import numpy as np
 import sys
+import random
 
 class ConditionalProbabilityTable():
     def __init__(self,initTable,initParents,initNodeName):
@@ -9,6 +10,7 @@ class ConditionalProbabilityTable():
         self.ProbabilityTableValues = np.array(initTable).T[-1].astype(np.float)
         self.ParentsList = initParents
         self.NodeName = initNodeName
+        #self.SortTable , self.SortValues  = self.ProbabilityTable[0] , self.ProbabilityTableValues 
         self.SortTable , self.SortValues =  self.SortMax2MinProb( self.ProbabilityTable[0] , self.ProbabilityTableValues )
         if self.isDiscreteDistribution() == False:
             AllParentsKey = np.unique(np.array(initTable)[:,:-2],axis=0)
@@ -51,6 +53,7 @@ class ConditionalProbabilityTable():
                 raise NameError("Parents state is not enough")
             
         return self.SortMax2MinProb ( RunTable[0], ValueTable )
+        #return RunTable[0], ValueTable 
     
     def getNodeProbabilityImmediately(self,ParentState):
         KeyDict = ""
@@ -67,7 +70,7 @@ class ConditionalProbabilityTable():
         else:
             NodeProba,ValueTable = self.getNodeProbabilityImmediately(ParentState)     
             
-        RandomValue = np.random.random()
+        RandomValue = random.random()
         ProbThreshold = 0
         for index in range(len(NodeProba)):
             ProbThreshold += ValueTable[index]
@@ -80,17 +83,17 @@ class ConditionalProbabilityTable():
             if self.isDiscreteDistribution():   
                 NodeProba,ValueTable = self.SortTable , self.SortValues
             else:
-                NodeProba,ValueTable = self.getNodeProbabilityImmediately(ParentState)
+                NodeProba,ValueTable = self.getNodeProbabilityImmediately(ParentState) 
             # Sampling
-            RandomValue = np.random.random()
+            RandomValue = random.random()
             ProbThreshold = 0
             for index in range(len(NodeProba)):
                 ProbThreshold += ValueTable[index]
                 if RandomValue < ProbThreshold:
                     ParentState[self.NodeName] = NodeProba[index]    
                     return ParentState, ParentLikelihoodWeight
+
         else:
-            
             if self.isDiscreteDistribution():   
                 NodeProba, ValueTable = self.SortTable , self.SortValues
             else:
@@ -101,6 +104,7 @@ class ConditionalProbabilityTable():
                     ParentState[self.NodeName] = NodeProba[index]
                     ParentLikelihoodWeight[self.NodeName] = float(ValueTable[index])
                     return ParentState, ParentLikelihoodWeight
+                    
 
     def toString(self):
         desc = ''
