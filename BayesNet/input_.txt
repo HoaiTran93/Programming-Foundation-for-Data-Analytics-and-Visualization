@@ -1,0 +1,6 @@
+5
+Burglary;;True,False;2;0.01,0.99
+Earthquake;;True,False;2;0.02,0.98
+Alarm;Burglary,Earthquake;True,False;2,2,2;0.95,0.05,0.29,0.71,0.94,0.06,0.001,0.999
+JohnCalls;Alarm;True,False;2,2;0.9,0.1,0.95,0.05
+MaryCalls;Alarm;True,False;2,2;0.7,0.3,0.01,0.99

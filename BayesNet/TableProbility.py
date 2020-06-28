@@ -10,8 +10,8 @@ class ConditionalProbabilityTable():
         self.ProbabilityTableValues = np.array(initTable).T[-1].astype(np.float)
         self.ParentsList = initParents
         self.NodeName = initNodeName
-        #self.SortTable , self.SortValues  = self.ProbabilityTable[0] , self.ProbabilityTableValues 
-        self.SortTable , self.SortValues =  self.SortMax2MinProb( self.ProbabilityTable[0] , self.ProbabilityTableValues )
+        self.SortTable , self.SortValues  = self.ProbabilityTable[0] , self.ProbabilityTableValues 
+        #self.SortTable , self.SortValues =  self.SortMax2MinProb( self.ProbabilityTable[0] , self.ProbabilityTableValues )
         if self.isDiscreteDistribution() == False:
             AllParentsKey = np.unique(np.array(initTable)[:,:-2],axis=0)
             self.DictofMinTable = {}
@@ -52,8 +52,8 @@ class ConditionalProbabilityTable():
             else:
                 raise NameError("Parents state is not enough")
             
-        return self.SortMax2MinProb ( RunTable[0], ValueTable )
-        #return RunTable[0], ValueTable 
+        #return self.SortMax2MinProb ( RunTable[0], ValueTable )
+        return RunTable[0], ValueTable 
     
     def getNodeProbabilityImmediately(self,ParentState):
         KeyDict = ""

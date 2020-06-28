@@ -21,6 +21,8 @@ def GetObserKey(Obser):
         for key in  Obser:
             KeyStr += str(key)+Obser[key]
         return KeyStr
+def GetIntersection(lst1, lst2): 
+    return list(set(lst1) & set(lst2)) 
 
 def main(argv):
     inputfile = ''
@@ -53,7 +55,6 @@ def main(argv):
     SamplingSetCache = {}
     if LIKELIHOOD == True:
         for ques_index in range(len(Obser)):
-            random.seed(0)
             NodeNameList = topo
             if len(Obser[ques_index]) == 0:
                 Observations = {}
@@ -70,7 +71,7 @@ def main(argv):
                 for _ in range(SAMPLE):
                     RunningVar = {}
                     ParentLikelihoodWeight = {}
-                    w = 1
+                    w = 1.0
                     for nodeName in topo:   
                         node = rp.model.getVertexNode(nodeName)
                         RunningVar,ParentLikelihoodWeight = node.tableProb.getOutputWithLikehood(RunningVar,ParentLikelihoodWeight,Observations)
@@ -96,18 +97,19 @@ def main(argv):
                 print("No need sampling agian!")
                 NumpyRunValue, NumpyKey, NumpyWeight, TotalWeight = SamplingSetCache[GetObserKey(Observations)]
 
-
-
             ListofIndexQues = []
-            for Node in Question:
+            for indexQues,Node in enumerate(Question):
                 NodeName = Node
                 Value    = Question[NodeName]
                 indexNumpyRunValue = np.where(NumpyKey==NodeName)[0][0]
-                ListofIndexQues += list(np.where(NumpyRunValue[:,indexNumpyRunValue] == Value)[0])
+                if indexQues == 0:
+                    ListofIndexQues = list(np.where(NumpyRunValue[:,indexNumpyRunValue] == Value)[0])
 
-            ListofIndexQues = list(set(ListofIndexQues))
-            Output = np.sum(NumpyWeight[ListofIndexQues]) /TotalWeight
+                ListofIndexQues = GetIntersection(ListofIndexQues,list(np.where(NumpyRunValue[:,indexNumpyRunValue] == Value)[0]))
+
+            Output = np.sum(NumpyWeight[ListofIndexQues]) / TotalWeight
             ListOutput.append(Output)
+
     else:
         # forward
         RunForwardList = []
@@ -153,7 +155,7 @@ def main(argv):
                 indexNumpyRunValue = np.where(NumpyKey==NodeName)[0][0]
                 indexQuers = np.where(TempObserMatrix[:,indexNumpyRunValue] == Value)[0]
                 TempObserMatrix = TempObserMatrix[indexQuers]
-
+            
             Output = len(np.where(NumpyRunValue[:,indexNumpyRunValue] == Value)[0])/NumpyRunValue.shape[0]
             print('============================')
             ListOutput.append(Output)
