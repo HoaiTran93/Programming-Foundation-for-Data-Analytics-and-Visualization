@@ -1,8 +1,9 @@
 import numpy as np
+import copy
 
 class FactorUtilities():
-    def __init__(self, a=None):
-        self.a = a
+    # def __init__(self):
+    #     return None
 
     def multiply(self, factor1, order_factor1, factor2, order_factor2):
         #find all the common variables between the two factors:
@@ -67,7 +68,7 @@ class FactorUtilities():
         
         return result
 
-
+    ##function uilities for multiply
     def uniqueElement(self, observation):
         # intilize a null list
         unique_list = []
@@ -138,3 +139,38 @@ class FactorUtilities():
                 count += 1
             #print(output)
             return output
+
+    def sum_out(self, factor, order_factor, key):
+        #remove column key and value
+        new_factor = copy.deepcopy(factor)
+        self.removeColumn(new_factor, order_factor, key)
+        self.removeValue(new_factor)
+
+        #sum_out
+        newProbList = [] #list for probability combinations
+        newValueList = [] #list for sum_out value
+        count_index = 0
+        for row in range(len(new_factor)):
+            entry = new_factor[row]
+            if entry not in newProbList:
+                newProbList.append(entry)
+                newValueList.append(factor[row][-1])
+                count_index += 1
+            else:
+                newValueList[count_index-1] = newValueList[count_index-1] + factor[row][-1]
+
+        #merge list of probability combinations and list of value
+        for row in range(len(newProbList)):
+            newProbList[row].append(newValueList[row])
+        return newProbList
+
+    ##function uilities for sum_out
+    def removeColumn(self, factor, order_factor, variable):
+        index_column = order_factor.index(variable)
+        order_factor.pop(index_column)
+        for row in range(len(factor)):
+            factor[row].pop(index_column)
+
+    def removeValue(self, factor):
+        for row in range(len(factor)):
+            factor[row].pop(-1)
