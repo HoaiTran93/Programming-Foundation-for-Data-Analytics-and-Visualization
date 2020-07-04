@@ -1,5 +1,6 @@
 import sys, getopt
 from ReadInput import *
+from FactorUtilities import *
 
 '''run directly'''
 '''
@@ -13,6 +14,8 @@ if __name__ == "__main__":
 
 '''run on console'''
 def main(argv):
+    ft = FactorUtilities()
+
     inputfile = ''
     testfile = ''
     opts, args = getopt.getopt(argv,"hi:i:",["model=","test="])
@@ -26,7 +29,9 @@ def main(argv):
     rp.model.println()
     tp = ReadTestCase(testfile)
     a,b = tp.generate()
+    print("len a: ",len(a))
     print("a: ",a)
+    print("len b: ",len(b))
     print("b: ",b)
 
     DFS = 0
@@ -35,47 +40,24 @@ def main(argv):
     topo = sorter.sort(BFS)
     print("topoBFS:", topo)
 
-    sample = 30
-    RunForwardList = []
-    NodeList = []
-    for sampleIndex in range(sample):
-        RunningVar = {}
-        for nodeName in topo:
-            node = rp.model.getVertexNode(nodeName)
-            #print("nodeName: ",node.vertex)
-            #print("tableProb: ",node.tableProb)
-            NodeList.append(node.tableProb)
-            node.tableProb.getOutput(RunningVar)
-        RunForwardList.append(RunningVar)
-        
-    Observations = { 'I' : 'Cao', 'D' : 'Kho' }
-    NodeNameList = topo
+    nodeD = rp.model.getVertexNode("D").tableProb
+    nodeG = rp.model.getVertexNode("G").tableProb
 
-    RunValueList = []
-    KeyList = RunForwardList[0].keys()
-    for RunForwardValue in RunForwardList:
-        OneRow = []
-        ObservationsCheck = True
-        for key in Observations:
-            if Observations[key] != RunForwardValue[key]:
-                ObservationsCheck = False
-        if ObservationsCheck == True:
-            for key in RunForwardValue: 
-                OneRow.append(RunForwardValue[key])
-            RunValueList.append(OneRow)
-    NumpyRunValue = np.array(RunValueList)
-    NumpyKey = np.array(list(KeyList))
+    # print("nodeD table", nodeD.initTable)
+    # print("nodeD prob", nodeD.OrderProb)
+
+    # print("nodeG table", nodeG.initTable)
+    # print("nodeG prob", nodeG.OrderProb)
+
+    result,order_result = ft.multiply(nodeD.initTable,nodeD.OrderProb,nodeG.initTable,nodeG.OrderProb)
+    print("order_result: ",order_result)
+    print("result: ",result)
+
+    result_sum,order_result_sum = ft.sum_out(result, order_result, "D")
+    print("order_result_sum: ",order_result_sum)
+    print("result_sum: ",result_sum)
 
 
-    for Node in NodeList:
-        if Node.NodeName in Observations.keys():
-            print(Node.NodeName, Observations[Node.NodeName])
-        else:
-            print(Node.NodeName)
-            indexNumpyRunValue = np.where(NumpyKey==Node.NodeName)[0][0]
-            for Value in Node.getValueList():
-                print(Value,len(np.where(NumpyRunValue[:,indexNumpyRunValue] == Value)[0])/NumpyRunValue.shape[0])
-        print('============================')
 
 if __name__ == "__main__":
     main(sys.argv[1:])    

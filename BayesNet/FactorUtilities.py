@@ -23,50 +23,65 @@ class FactorUtilities():
 
         all_vars = f1+common_vars+f2
         num_vars = len(all_vars)
-
+        # print("f1: ",f1)
+        # print("f2: ",f2)
+        # print("common_vars: ",common_vars)
+        # print("all_vars: ",all_vars)
         #find index common column
         index_common_f1 = order_factor1.index(common_vars[0])
-        index_common_f2 = order_factor2.index(common_vars[0])
 
+        # print("index_common_f1: ",index_common_f1)
+        
         #swap common column in factor1 to at the end
-        self.swapCommon(factor1,index_common_f1,False)
-        self.swapCommon(order_factor1,index_common_f1,False)
+        if f1 != []:
+            self.swapCommon(factor1,index_common_f1,False)
+            self.swapCommon(order_factor1,index_common_f1,False)
+        
+        #find index common column
+        index_common_f2 = order_factor2.index(common_vars[0])
+        # print("index_common_f2: ",index_common_f2)
 
         #swap common column in factor2 to at the beginning
-        self.swapCommon(factor2,index_common_f2,True)
-        self.swapCommon(order_factor2,index_common_f2,True)
+        if f2 != []:
+            self.swapCommon(factor2,index_common_f2,True)
+            self.swapCommon(order_factor2,index_common_f2,True)
 
         #prepare list input
         listInput = []
 
         #search through factor 1
         for var in order_factor1:
+            # print("var1: ",var)
             tmp = self.uniqueElement([factor1[i][order_factor1.index(var[0])] for i in range(len(factor1))])
             listInput.append(tmp)
 
         #search through factor 2, skip common at the beginning of factor 2
-        sub_order_factor2 = [order_factor2[1:]]
+        sub_order_factor2 = order_factor2[1:]
+        # print("sub_order_factor2: ",sub_order_factor2)
         for var in sub_order_factor2:
+            # print("var2: ",var)
             tmp = self.uniqueElement([factor2[i][order_factor2.index(var[0])] for i in range(len(factor2))])
             listInput.append(tmp)
 
+        # print("listInput: ",listInput)
         #generate probability combinations
         result = self.parsing_combinationProb(listInput)
+        # print("result: ",result)
 
         #add value of probability combinations
         for row in range(len(result)):
             key1 = result[row][:len(order_factor1)]
-            key2 = result[row][len(order_factor2):]
-            #print("key1: ",key1)
-            #print("key2: ",key2)
+            key2 = result[row][len(order_factor1) - len(common_vars):]
+            # print("key1: ",key1)
+            # print("key2: ",key2)
             value1 = self.get_value(factor1,tuple(key1))
             value2 = self.get_value(factor2,tuple(key2))
-            #print("value1: ",value1)
-            #print("value2: ",value2)
+            # print("value1: ",value1)
+            # print("value2: ",value2)
             product = value1 * value2
             result[row].append(product)
         
-        return result
+        return result,all_vars
 
     ##function uilities for multiply
     def uniqueElement(self, observation):
@@ -152,17 +167,24 @@ class FactorUtilities():
         count_index = 0
         for row in range(len(new_factor)):
             entry = new_factor[row]
+            print("entry:",entry)
+            print("value:",factor[row][-1])
             if entry not in newProbList:
                 newProbList.append(entry)
                 newValueList.append(factor[row][-1])
                 count_index += 1
             else:
-                newValueList[count_index-1] = newValueList[count_index-1] + factor[row][-1]
+                index = newProbList.index(entry)
+                print("index", index)
+                print("newValueList[index]: ",newValueList[index])
+                print("factor[row][-1]: ",factor[row][-1])
+                print("cong don: ",newValueList[index] + factor[row][-1])
+                newValueList[index] = newValueList[index] + factor[row][-1]
 
         #merge list of probability combinations and list of value
         for row in range(len(newProbList)):
             newProbList[row].append(newValueList[row])
-        return newProbList
+        return newProbList,order_factor
 
     ##function uilities for sum_out
     def removeColumn(self, factor, order_factor, variable):
