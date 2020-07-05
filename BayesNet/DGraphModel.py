@@ -8,47 +8,41 @@ class DGraphModel(AbstractGraph):
         AbstractGraph.__init__(self)
 
     def connect(self, vFrom, vTo, weight=0):
-        try:
-            nodeF = self.getVertexNode(vFrom)
-        except nodeF is None:
+        nodeF = self.getVertexNode(vFrom)
+        if nodeF is None:
             msg = "The following vertex is not found: {}".format(vFrom)
-            print(msg)
+            raise Exception(msg)
 
-        try:
-            nodeT = self.getVertexNode(vTo)
-        except nodeT is None:
+        nodeT = self.getVertexNode(vTo)
+        if nodeT is None:
             msg = "The following vertex is not found: {}".format(nodeT)
-            print(msg)
+            raise Exception(msg)
 
         nodeF.connect(nodeT, weight)
 
     def disconnect(self, vFrom, vTo):
-        try:
-            nodeF = self.getVertexNode(vFrom)
-        except nodeF is None:
+        nodeF = self.getVertexNode(vFrom)
+        if nodeF is None:
             msg = "The following vertex is not found: {}".format(vFrom)
-            print(msg)
+            raise Exception(msg)
 
-        try:
-            nodeT = self.getVertexNode(vTo)
-        except nodeT is None:
+        nodeT = self.getVertexNode(vTo)
+        if nodeT is None:
             msg = "The following vertex is not found: {}".format(nodeT)
-            print(msg)
+            raise Exception(msg)
 
-        try:
-            edge = self.getEdge(nodeT)
-        except edge is None:
+        edge = self.getEdge(nodeT)
+        if edge is None:
             msg = "Opps! E(from:{}, to:{})".format(vFrom, vTo)
-            print(msg)
+            raise Exception(msg)
         
         nodeF.removeTo(nodeT)
 
     def remove(self, vertex):
-        try:
-            nodeA = self.getVertexNode(vertex)
-        except nodeA is None:
+        nodeA = self.getVertexNode(vertex)
+        if nodeA is None:
             msg = "The following vertex is not found: {}".format(vertex)
-            print(msg)
+            raise Exception(msg)
 
         #disconnect all
         for nodeB in self.nodeList:

@@ -143,31 +143,29 @@ class AbstractGraph(IGraph, VertexNode, GraphIterator):
         return node != None
 
     def getWeight(self, vFrom, vTo):
-        try:
-            nodeF = self.getVertexNode(vFrom)
-        except nodeF is None:
+        nodeF = self.getVertexNode(vFrom)
+        if nodeF is None:
             msg = "The following vertex is not found: {}".format(vFrom)
-            print(msg)
+            raise Exception(msg)
 
-        try:
-            nodeT = self.getVertexNode(vTo)
-        except nodeT is None:
+        nodeT = self.getVertexNode(vTo)
+        if nodeT is None:
             msg = "The following vertex is not found: {}".format(vFrom)
-            print(msg)
+            raise Exception(msg)
         
-        try:
-            edge = nodeF.getEdge(nodeT)
-        except edge is None:
+        edge = nodeF.getEdge(nodeT)
+        if edge is None:
             msg = "Oops! That was no valid number. E(from:{}, to:{})".format(self.vFrom, self.vTo)
-            print(msg)
+            raise Exception(msg)
+
         return edge.weight
 
     def getOutwardEdges(self, vFrom):
-        try:
-            node = self.getVertexNode(vFrom)
-        except node is None:
+        node = self.getVertexNode(vFrom)
+        if node is None:
             msg = "The following vertex is not found: {}".format(vFrom)
-            print(msg)
+            raise Exception(msg)
+
         return node.getOutwardEdges()
 
     def getInwardEdges(self, vTo):
@@ -191,19 +189,19 @@ class AbstractGraph(IGraph, VertexNode, GraphIterator):
         return len(self.nodeList)
 
     def getVertexInDegree(self, vertex):
-        try:
-            node = self.getVertexNode(vertex)
-        except node is None:
+        node = self.getVertexNode(vertex)
+        if node is None:
             msg = "The following vertex is not found: {}".format(vertex)
-            print(msg)
+            raise Exception(msg)
+
         return node.getInDegree()
 
     def getVertexOutDegree(self, vertex):
-        try:
-            node = self.getVertexNode(vertex)
-        except node is None:
+        node = self.getVertexNode(vertex)
+        if node is None:
             msg = "The following vertex is not found: {}".format(vertex)
-            print(msg)
+            raise Exception(msg)
+
         return node.getOutDegree()
 
     def println(self):

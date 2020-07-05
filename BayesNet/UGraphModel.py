@@ -9,49 +9,43 @@ class UGraphModel(AbstractGraph):
         AbstractGraph.__init__(self)
 
     def connect(self, vFrom, vTo, weight=0):
-        try:
-            nodeF = self.getVertexNode(vFrom)
-        except nodeF is None:
+        nodeF = self.getVertexNode(vFrom)
+        if nodeF is None:
             msg = "The following vertex is not found: {}".format(vFrom)
-            print(msg)
+            raise Exception(msg)
 
-        try:
-            nodeT = self.getVertexNode(vTo)
-        except nodeT is None:
+        nodeT = self.getVertexNode(vTo)
+        if nodeT is None:
             msg = "The following vertex is not found: {}".format(vTo)
-            print(msg)
+            raise Exception(msg)
 
         nodeF.connect(nodeT, weight)
         nodeT.connect(nodeF, weight)
 
     def disconnect(self, vFrom, vTo):
-        try:
-            nodeF = self.getVertexNode(vFrom)
-        except nodeF is None:
+        nodeF = self.getVertexNode(vFrom)
+        if nodeF is None:
             msg = "The following vertex is not found: {}".format(vFrom)
-            print(msg)
+            raise Exception(msg)
 
-        try:
-            nodeT = self.getVertexNode(vTo)
-        except nodeT is None:
+        nodeT = self.getVertexNode(vTo)
+        if nodeT is None:
             msg = "The following vertex is not found: {}".format(vTo)
-            print(msg)
+            raise Exception(msg)
         
-        try:
-            edge = self.getEdge(nodeT)
-        except edge is None:
+        edge = self.getEdge(nodeT)
+        if edge is None:
             msg = "The following vertex is not found: {}".format(edge)
-            print(msg)
+            raise Exception(msg)
 
         nodeF.removeTo(nodeT) #nodeF.inDegree -= 1; nodeF.outDegree -= 1;
         nodeT.removeTo(nodeF) #nodeT.inDegree -= 1; nodeT.outDegree -= 1;
 
     def remove(self, vertex):
-        try:
-            nodeF = self.getVertexNode(vertex)
-        except nodeF is None:
+        nodeF = self.getVertexNode(vertex)
+        if nodeF is None:
             msg = "The following vertex is not found: {}".format(nodeF)
-            print(msg)
+            raise Exception(msg)
 
         for nodeT in self.nodeList:
             edge = nodeF.getEdge(nodeT)
@@ -73,7 +67,7 @@ class UGraphModelAlgorithm(UGraphModel):
         while vertexIt.hasNext():
             vertex = vertexIt.next()
             vertexList.append(vertex)
-        print("vertexList:", vertexList)
+        # print("vertexList:", vertexList)
         ##(2) Process each vertex in vertexList
         mst = UGraphModel()
         while vertexList:
@@ -101,7 +95,7 @@ class UGraphModelAlgorithm(UGraphModel):
                             weight = self.graph.getWeight(parent, child)
                             #print("weight:", weight)
                             msg = "parent:{}, child:{}, weight:{}".format(parent, child, weight)
-                            print(msg)
+                            # print(msg)
                             edge = UGraphModelAlgorithm.Edge(parent, child, weight) ##to use inner class: inner = outer.Inner() . refer https://www.datacamp.com/community/tutorials/inner-classes-python
                             crossEdges.put(edge)
 
@@ -109,7 +103,7 @@ class UGraphModelAlgorithm(UGraphModel):
                 if hasChildren:
                     smallest = crossEdges.get()
                     msg = "smallest vFrom:{}, vTo:{}, weight:{}".format(smallest.vFrom, smallest.vTo, smallest.weight)
-                    print(msg)
+                    # print(msg)
                     mst.add(smallest.vTo)
                     mst.connect(smallest.vFrom, smallest.vTo, smallest.weight)
                     vertexList.remove(smallest.vTo)

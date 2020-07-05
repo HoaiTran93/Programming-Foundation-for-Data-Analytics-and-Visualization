@@ -1,4 +1,10 @@
-3
-G=A;I=Cao,D=Kho
-G=A,L=Cao;I=Cao,D=Kho
-G=B,S=Cao; 
+
+
+   3 
+
+ 
+G=A; I=Cao, D=Kho  
+                 G=A,L=Manh;I=Cao,D=Kho    
+     G=B, S=Cao;
+
+  

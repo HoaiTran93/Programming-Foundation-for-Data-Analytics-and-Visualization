@@ -11,7 +11,7 @@ class ConditionalProbabilityTable():
         if self.isDiscreteDistribution() == False:
             self.ParentsNum = len(initParents)
             if self.ProbabilityTable.shape[0]-2 != self.ParentsNum:
-                raise NameError("Init failed, number of parents is wrong!")
+                raise Exception("Init failed, number of parents is wrong!")
 
     def getValueList(self):
         return list(set(self.ProbabilityTable[-2]))
@@ -30,7 +30,7 @@ class ConditionalProbabilityTable():
                 index = np.where( RunTable[0] == State )[0]
                 RunTable = RunTable[1:,index]
             else:
-                raise NameError("Parents state is not enough")
+                raise Exception("Parents state is not enough")
         return RunTable
 
     def getOutput(self,ParentState):
