@@ -51,13 +51,21 @@ class ReadModel():
 
     def parsing_tableProb(self):
         listProb = []
+        #print("vertexParentName: ",self.vertexParentName)
+        order_Prob = []
         for parent in (self.probMap[parentName] for parentName in self.vertexParentName if parentName != ''):
-            #print("parent:",parent)
+            # print("parent:",parent)
             listProb.append(parent)
         listProb.append(self.probMap[self.vertexName])
-        #print("listProb: ", listProb)
+        # print("listProb: ", listProb)
         tableCombinationProb = self.parsing_combinationProb(listProb, self.tableValue)
-        return tableCombinationProb
+        if self.vertexParentName != ['']: 
+            for index in range(len(self.vertexParentName)):
+                #print("item: ", self.vertexParentName[index])
+                order_Prob.append(self.vertexParentName[index])
+        order_Prob.append(self.vertexName)
+        #print("listnode: ", order_Prob)
+        return tableCombinationProb, order_Prob
 
     def parsing_combinationProb(self, listProb, tableValue):
         #print("tableValue: ", tableValue)
@@ -94,8 +102,8 @@ class ReadModel():
         return output
 
     def init_graph(self):
-        _tableProb = self.parsing_tableProb()
-        self.tableProb = ConditionalProbabilityTable(_tableProb, self.vertexParentName, self.vertexName)
+        _tableProb,_orderProb = self.parsing_tableProb()
+        self.tableProb = ConditionalProbabilityTable(_tableProb, _orderProb, self.vertexParentName, self.vertexName)
         self.model.add(self.vertexName, self.tableProb)
         for parent in self.vertexParentName:
             #print("parent: ",parent)

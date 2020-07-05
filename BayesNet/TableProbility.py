@@ -2,9 +2,10 @@ import numpy as np
 import sys
 
 class ConditionalProbabilityTable():
-    def __init__(self,initTable,initParents,initNodeName):
+    def __init__(self,initTable,initOrderProb,initParents,initNodeName):
         self.initTable = initTable
         self.ProbabilityTable = np.array(initTable).T.astype(dtype='<U21')
+        self.OrderProb = initOrderProb
         self.ParentsList = initParents
         self.NodeName = initNodeName
         if self.isDiscreteDistribution() == False:
@@ -83,5 +84,5 @@ class ConditionalProbabilityTable():
             for j in range(len(self.initTable[i])):
                 desc += str(self.initTable[i][j]) + " "
             desc += "\n"
-        desc += str(self.ParentsList) + " " + str(self.NodeName)
+        desc += str(self.OrderProb)
         return desc

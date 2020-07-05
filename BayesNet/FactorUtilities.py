@@ -167,18 +167,18 @@ class FactorUtilities():
         count_index = 0
         for row in range(len(new_factor)):
             entry = new_factor[row]
-            print("entry:",entry)
-            print("value:",factor[row][-1])
+            # print("entry:",entry)
+            # print("value:",factor[row][-1])
             if entry not in newProbList:
                 newProbList.append(entry)
                 newValueList.append(factor[row][-1])
                 count_index += 1
             else:
                 index = newProbList.index(entry)
-                print("index", index)
-                print("newValueList[index]: ",newValueList[index])
-                print("factor[row][-1]: ",factor[row][-1])
-                print("cong don: ",newValueList[index] + factor[row][-1])
+                # print("index", index)
+                # print("newValueList[index]: ",newValueList[index])
+                # print("factor[row][-1]: ",factor[row][-1])
+                # print("cong don: ",newValueList[index] + factor[row][-1])
                 newValueList[index] = newValueList[index] + factor[row][-1]
 
         #merge list of probability combinations and list of value
