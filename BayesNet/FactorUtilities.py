@@ -78,7 +78,7 @@ class FactorUtilities():
             value2 = self.get_value(factor2,tuple(key2))
             # print("value1: ",value1)
             # print("value2: ",value2)
-            product = value1 * value2
+            product = round(value1 * value2, 3)
             result[row].append(product)
         
         return result,all_vars
@@ -179,7 +179,7 @@ class FactorUtilities():
                 # print("newValueList[index]: ",newValueList[index])
                 # print("factor[row][-1]: ",factor[row][-1])
                 # print("cong don: ",newValueList[index] + factor[row][-1])
-                newValueList[index] = newValueList[index] + factor[row][-1]
+                newValueList[index] = round(newValueList[index] + factor[row][-1], 3)
 
         #merge list of probability combinations and list of value
         for row in range(len(newProbList)):
@@ -196,3 +196,9 @@ class FactorUtilities():
     def removeValue(self, factor):
         for row in range(len(factor)):
             factor[row].pop(-1)
+
+    def println(self, factor):
+        for row in range(len(factor)):
+            strr = str(factor[row])
+            print(strr)
+            
