@@ -24,12 +24,12 @@ class VertexNode(Edge):
         self.vertex = data
         self.tableProb = tableProb
         self.inDegree = self.outDegree = 0
-        self.adList = []     
+        self.adList = []
         
     def connect(self, vTo, weight):
         edge = self.getEdge(vTo)
         if edge is None:
-            edge = Edge(self, vTo, weight) 
+            edge = Edge(self, vTo, weight)
             self.adList.append(edge)
             edge.vFrom.outDegree += 1
             edge.vTo.inDegree += 1
@@ -233,7 +233,6 @@ class AbstractGraph(IGraph, VertexNode, GraphIterator):
                     break
                 line = "E({}, {}, {})".format(node.vertex, edge.vTo.vertex, edge.weight)
                 desc += " " + line + "\n"
-        
         desc += "======================================================\n"
         return desc
 
