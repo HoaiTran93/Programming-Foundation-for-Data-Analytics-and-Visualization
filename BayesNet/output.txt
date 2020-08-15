@@ -1,0 +1,14 @@
+===exact inference with condition===
+Question: ['I']
+Condition: ['D=De', 'L=Manh']
+Probability Table:
+[['Thap', 0.582425068119891], ['Cao', 0.417574931880109]]
+Result: Thap
+===== Done Question 1 =====
+
+===exact inference with no condition===
+Question: ['G']
+Probability Table:
+[['A', 0.362], ['B', 0.2884], ['C', 0.34959999999999997]]
+===== Done Question 2 =====
+
