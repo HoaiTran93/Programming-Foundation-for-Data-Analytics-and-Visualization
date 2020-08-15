@@ -7,9 +7,15 @@ class Factor():
         self.tableProb = initTableProb
         self.orderProb = initOrderProb
 
-    def updateFactor(self, newTableProb, newOrderProb):
-        self.tableProb = newTableProb
-        self.orderProb = newOrderProb
+    def updateFactorElement(self, newTableProb= None, newOrderProb= None):
+        if newTableProb is not None:
+            self.tableProb = newTableProb
+
+        if newOrderProb is not None:    
+            self.orderProb = newOrderProb
+
+    def updateFactor(self, newFactor):
+        self.updateFactorElement(newFactor.tableProb, newFactor.orderProb)
 
 class FactorUtilities(Factor):
     def __init__(self):
@@ -17,6 +23,11 @@ class FactorUtilities(Factor):
         self.BFS = 1
 
     def multiply(self, factor1, factor2):
+        print("======enter multiply=======")
+        print("factor 1 origin: ",factor1.orderProb)
+        print("factor 1 origin: ",factor1.tableProb)
+        print("factor 2 origin: ",factor2.orderProb)
+        print("factor 2 origin: ",factor2.tableProb)
         #find all the common variables between the two factors:
         common_vars = []
         f1 = []
@@ -34,64 +45,77 @@ class FactorUtilities(Factor):
 
         all_vars = f1+common_vars+f2
         num_vars = len(all_vars)
-        # print("f1: ",f1)
-        # print("f2: ",f2)
-        # print("common_vars: ",common_vars)
-        # print("all_vars: ",all_vars)
+        print("f1: ",f1)
+        print("f2: ",f2)
+        print("common_vars: ",common_vars)
+        print("all_vars: ",all_vars)
         #find index common column
         index_common_f1 = factor1.orderProb.index(common_vars[0])
 
-        # print("index_common_f1: ",index_common_f1)
-        
+        print("index_common_f1: ",index_common_f1)
+        print("factor 1 before: ",factor1.orderProb)
+        print("factor 1 before: ",factor1.tableProb)
         #swap common column in factor1 to at the end
         if f1 != []:
             self.swapCommon(factor1.tableProb,index_common_f1,False)
             self.swapCommon(factor1.orderProb,index_common_f1,False)
         
+        print("factor 1 after: ",factor1.orderProb)
+        print("factor 1 after: ",factor1.tableProb)
+
+        print("factor 2 before: ",factor2.orderProb)
+        print("factor 2 before: ",factor2.tableProb)
         #find index common column
         index_common_f2 = factor2.orderProb.index(common_vars[0])
-        # print("index_common_f2: ",index_common_f2)
+        print("index_common_f2: ",index_common_f2)
 
         #swap common column in factor2 to at the beginning
         if f2 != []:
             self.swapCommon(factor2.tableProb,index_common_f2,True)
             self.swapCommon(factor2.orderProb,index_common_f2,True)
 
+        print("factor 2 after: ",factor2.orderProb)
+        print("factor 2 after: ",factor2.tableProb)
         #prepare list input
         listInput = []
 
         #search through factor 1
         for var in factor1.orderProb:
-            # print("var1: ",var)
+            print("var1: ",var)
             tmp = self.uniqueElement([factor1.tableProb[i][factor1.orderProb.index(var[0])] for i in range(len(factor1.tableProb))])
             listInput.append(tmp)
 
         #search through factor 2, skip common at the beginning of factor 2
         sub_order_factor2 = factor2.orderProb[1:]
-        # print("sub_order_factor2: ",sub_order_factor2)
+        print("sub_order_factor2: ",sub_order_factor2)
         for var in sub_order_factor2:
-            # print("var2: ",var)
+            print("var2: ",var)
             tmp = self.uniqueElement([factor2.tableProb[i][factor2.orderProb.index(var[0])] for i in range(len(factor2.tableProb))])
             listInput.append(tmp)
 
-        # print("listInput: ",listInput)
+        print("listInput: ",listInput)
         #generate probability combinations
         result = self.parsing_combinationProb(listInput)
-        # print("result: ",result)
+        print("result: ",result)
 
         #add value of probability combinations
         for row in range(len(result)):
+            print("--------")
+            print("factor1: ",factor1.orderProb)
+            print("factor2: ",factor2.orderProb)
             key1 = result[row][:len(factor1.orderProb)]
             key2 = result[row][len(factor1.orderProb) - len(common_vars):]
-            # print("key1: ",key1)
-            # print("key2: ",key2)
+            print("key1: ",key1)
+            print("key2: ",key2)
             value1 = self.get_value(factor1.tableProb,tuple(key1))
             value2 = self.get_value(factor2.tableProb,tuple(key2))
-            # print("value1: ",value1)
-            # print("value2: ",value2)
+            print("value1: ",value1)
+            print("value2: ",value2)
             product = value1 * value2
             result[row].append(product)
         
+        print("======Exit multiply==========")
+        self.reOrderAllVars(factor1.orderProb, factor2.orderProb, all_vars)
         return Factor(result, all_vars)
 
     ##function uilities for multiply
@@ -165,6 +189,29 @@ class FactorUtilities(Factor):
                 count += 1
             #print(output)
             return output
+
+    def reOrderAllVars(self, orderFactor1, orderFactor2, all_vars):
+        print('all_vars before: ', all_vars)
+        print('orderFactor1: ',orderFactor1)
+        print('orderFactor2: ',orderFactor2)
+        index_all_vars = 0
+        for index in range(len(all_vars)):
+            # print("index:", index)
+            if index < len(orderFactor1) - 1:
+                char = orderFactor1[index]
+                # print("char orderFactor1:",char)
+            else:
+                char = orderFactor2[index + 1 - len(orderFactor1)]
+                # print("char orderFactor2:",char)
+            if char in all_vars:
+                tmp_index = all_vars.index(char)
+                # print("tmp_index:",tmp_index)
+                tmp_char = all_vars[index_all_vars]
+                # print("tmp_char:",tmp_char)
+                all_vars[index_all_vars] = all_vars[tmp_index]
+                all_vars[tmp_index] = tmp_char
+                index_all_vars += 1
+        print('all_vars after: ', all_vars)
 
     def sum_out(self, factor, key):
         #remove column key and value
@@ -269,7 +316,7 @@ class FactorUtilities(Factor):
                 print("lst: ",lst.orderProb)
                 print("lst value: ",lst.tableProb)
             print("===========")
-        return factorList[0]
+        return factorList
         # self.sumoutRemainNode(remainNode,factorList)
 
     def updateFactorList(self,factorlist, factor_contain_var, newfactor):
@@ -344,3 +391,51 @@ class FactorUtilities(Factor):
     #                 newfactor = self.sum_out(factorList[index], node)
     #                 factorList.remove(factorList[index])
     #                 factorList.insert(0, newfactor)
+
+    def findVartoRemove(self, topo_original, varQuestion, varCondition):
+        topo = topo_original.copy()
+        for charQ in varQuestion[0]:
+            print("delete: ",charQ)
+            topo.remove(charQ)
+
+        for charE in varCondition[0]:
+            char = charE.split('=')[0]
+            print("delete: ",char)
+            topo.remove(char)
+        return topo
+
+
+    def multiplyAllVertex(self, factorList):
+        firstFactor = factorList[0]
+        secondFactor = factorList[1]
+        factorList.remove(firstFactor)
+        factorList.remove(secondFactor)
+        print("firstFactor: ",firstFactor.orderProb)
+        print("secondFactor: ",secondFactor.orderProb)
+        tmp_result = self.multiply(firstFactor, secondFactor)
+
+        for factor in factorList:
+            print("factor: ",factor.orderProb)
+            tmp_result = self.multiply(tmp_result, factor)
+        return tmp_result
+
+    def finalizeProbability(self, factor):
+        sumProb = 0
+        probLists = []
+        for element in factor.tableProb:
+            sumProb += element[-1]
+
+        for element in factor.tableProb:
+            element[-1] = element[-1] / sumProb
+            probLists.append(element[-1])
+
+        print("order: ", factor.orderProb)
+        print("value:\n",factor.tableProb)
+        print("probLists: ",probLists)
+
+        my_array = np.array(probLists)
+        id_max  = np.argmax(my_array)
+
+        print("RESULT: ", factor.tableProb[id_max][0])
+
+

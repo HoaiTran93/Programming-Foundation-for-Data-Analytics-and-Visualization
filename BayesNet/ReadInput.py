@@ -15,6 +15,7 @@ class ReadModel():
         ##remove spaces##
         for i in range(len(lines)):
             lines[i] = lines[i].strip()
+            lines[i] = lines[i].replace(' ','')
 
         ##remove empty lines##
         while lines.count('') > 0:
@@ -120,6 +121,7 @@ class ReadTestCase():
         ##remove spaces##
         for i in range(len(lines)):
             lines[i] = lines[i].strip()
+            lines[i] = lines[i].replace(' ','')
 
         ##remove empty lines##
         while lines.count('') > 0:
@@ -129,11 +131,13 @@ class ReadTestCase():
         
     def generate(self):
         self.correctInput()
-        listProb = []
-        listObs = []
+        listConditions = []
+        listObservations = []
+
         for line in self.lines:
-            ObservationList = dict()
-            Probability = dict()
+            Observation = dict()
+            Condition = dict()
+            done_parse = False
             #print("line: ",line)
             if line.find(";") == -1: #check numtest case
                 self.numTestcase = int(line)
@@ -144,27 +148,35 @@ class ReadTestCase():
                 input = line.split(';')
                 #print("input: ", input)
                 prob = str(input[0])
-                #print("prob: ", prob)
-                for subProb in prob.split(','):
-                    #print("subProb: ",subProb)
-                    subP = subProb.split('=')
-                    #print("subP: ", subP)
-                    Probability.update({subP[0]:subP[1]})
-                condition = input[1].split(',')
-                #print("condition: ", condition)
-                for subcondition in condition:
-                    if subcondition == '':
-                        ObservationList = []
-                        break
-                    sub = subcondition.split('=')
-                    #print("subcondition: ",sub)
-                    ObservationList.update({sub[0]:sub[1]})
-                #print("Probability: ",Probability)
-                #print("ObservationList: ",ObservationList)
-                #print("=======")
-                listProb.append(Probability)
-                listObs.append(ObservationList)
-        return listProb, listObs
+                if prob.find("=") == -1: # check exactly approxiate
+                    Obser = prob.split(',')
+                    Condit = input[1].split(',')
+                    listConditions.append(Condit)
+                    listObservations.append(Obser)
+                    done_parse = True
+                else:
+                    #print("prob: ", prob)
+                    for subProb in prob.split(','):
+                        #print("subProb: ",subProb)
+                        subP = subProb.split('=')
+                        #print("subP: ", subP)
+                        Observation.update({subP[0]:subP[1]})
+                if not done_parse:
+                    condition = input[1].split(',')
+                    #print("condition: ", condition)
+                    for subcondition in condition:
+                        if subcondition == '':
+                            Condition = []
+                            break
+                        sub = subcondition.split('=')
+                        #print("subcondition: ",sub)
+                        Condition.update({sub[0]:sub[1]})
+                    #print("Probability: ",Probability)
+                    #print("ObservationList: ",ObservationList)
+                    #print("=======")
+                    listConditions.append(Condition)
+                    listObservations.append(Observation)
+        return listObservations, listConditions
         
 
     

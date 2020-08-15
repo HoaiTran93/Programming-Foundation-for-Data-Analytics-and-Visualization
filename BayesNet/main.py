@@ -26,18 +26,20 @@ def main(argv):
             testfile = arg
     rp = ReadModel(inputfile)
     rp.generate()
+    print("<<<<<Original model>>>>>")
     rp.model.println()
 
     tp = ReadTestCase(testfile)
-    ques, obs = tp.generate()
+    ques, condit = tp.generate()
     print("ques: ",ques)
-    print("obs: ",obs)
+    print("condit: ",condit)
+    
 
     # condition = "D=De"
     # ft.reduceElementbyCondition(rp.model, condition)
-    # condition = "I=Cao"
-    # ft.reduceElementbyCondition(rp.model, condition)
-    #
+    # # condition = "I=Cao"
+    # # ft.reduceElementbyCondition(rp.model, condition)
+    # print("<<<<<Sub model>>>>>")
     # rp.model.println()
 
     DFS = 0
@@ -45,17 +47,31 @@ def main(argv):
     sorter = TopoSorter(rp.model)
     topo = sorter.sort(BFS)
 
-    nodeQuestion = 'S'
+    var2remove = ft.findVartoRemove(topo, ques, condit)
+    print("var2remove: ",var2remove)
+
+    for condition in condit[0]:
+        print("condition: ",condition)
+        ft.reduceElementbyCondition(rp.model, condition)
+    
     listfactor = []
-    var2remove = ft.findPath(rp.model, nodeQuestion)
-    for nodeName in var2remove:
-        print("nodeName: ", nodeName)
+    for nodeName in topo:
         node = rp.model.getVertexNode(nodeName).tableProb
-        nodeFactor = Factor(node.initTable,node.OrderProb)
+        nodeFactor = Factor(node.initTable, node.OrderProb)
         listfactor.append(nodeFactor)
-    node = rp.model.getVertexNode(nodeQuestion).tableProb
-    nodeFactor = Factor(node.initTable,node.OrderProb)
-    listfactor.append(nodeFactor)
+    
+    # factor = ft.SumProduct(listfactor,var2remove)
+    # nodeQuestion = 'G'
+    # listfactor = []
+    # var2remove = ft.findPath(rp.model, nodeQuestion)
+    # for nodeName in var2remove:
+    #     print("nodeName: ", nodeName)
+    #     node = rp.model.getVertexNode(nodeName).tableProb
+    #     nodeFactor = Factor(node.initTable,node.OrderProb)
+    #     listfactor.append(nodeFactor)
+    # node = rp.model.getVertexNode(nodeQuestion).tableProb
+    # nodeFactor = Factor(node.initTable,node.OrderProb)
+    # listfactor.append(nodeFactor)
 
     # # ft.findPath(rp.model, "V4")
     # nodeD = rp.model.getVertexNode("D").tableProb
@@ -90,14 +106,31 @@ def main(argv):
     # print("nodeQuestion: ",nodeQuestion)
     # print("var2remove: ",var2remove)
     # print("remainList: ",remainList)
-    factor = ft.SumProduct(listfactor,var2remove)
-    print("order: ", factor.orderProb)
-    print("value:\n",factor.tableProb)
 
+    factorID = ft.SumProduct(listfactor,var2remove)
+    for factor in factorID:
+        print("order: ", factor.orderProb)
+        print("value:\n",factor.tableProb)
+
+    print("************************************************************************")
+    ftft = ft.multiplyAllVertex(factorID)
+    print("order: ", ftft.orderProb)
+    print("value:\n",ftft.tableProb)
+    
+    print("+++++++++")
+    result = ft.sum_out(ftft,'L')
+    print("order: ", result.orderProb)
+    print("value:\n",result.tableProb)
+
+    print("+++++++++")
+    result = ft.sum_out(result,'D')
+    print("order: ", result.orderProb)
+    print("value:\n",result.tableProb)
     # for factor in listfactor:
     #     print("order: ", factor.orderProb)
     #     print("value:\n",factor.tableProb)
-
+    print("FINALIZE")
+    ft.finalizeProbability(result)
 
 if __name__ == "__main__":
     main(sys.argv[1:])    
